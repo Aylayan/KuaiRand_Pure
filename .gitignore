@@ -1,0 +1,32 @@
+# Generated local data
+data/processed/*
+data/mysql_import/*
+!data/README.md
+
+# Python and Jupyter cache
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+
+# Local environments and secrets
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# IDE settings
+.idea/
+.vscode/
+
+# Logs, temporary files and backups
+*.log
+*.tmp
+*.bak
+~$*
+*.pbix.autosave
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
