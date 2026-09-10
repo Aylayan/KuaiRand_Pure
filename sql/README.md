@@ -20,6 +20,7 @@
 5. `05_create_analysis_views.sql`：创建标准推荐和随机推荐分析明细视图。
 6. `06_sql_core_metrics_reconciliation.sql`：复算核心指标并与 Python 基准核对。
 7. `07_create_metric_views.sql`：创建 6 张 Power BI 稳定指标视图。
+8. `08_create_business_analysis_views.sql`：创建同期推荐质量链、用户/内容分层和共同用户配对分析视图。
 
 ## 运行环境
 
@@ -42,3 +43,18 @@
 - `vw_metric_recommendation_comparison`
 
 `*_rate_pct` 已是 0—100 的百分数值，Power BI 只添加 `%` 显示符号。
+
+## 业务深化分析视图
+
+`08_create_business_analysis_views.sql` 在原有分析视图之上增加以下对象，不修改四张基础表：
+
+| 视图 | 粒度 | 用途 |
+|---|---|---|
+| `vw_business_same_period_detail` | 一条同期推荐记录 | 统一标准/随机推荐字段，保留推荐方式标签 |
+| `vw_metric_business_quality_chain` | 一种推荐方式 | 曝光层指标、点击后观看质量和负反馈护栏 |
+| `vw_metric_business_segments` | 推荐方式 × 分层维度 × 分组 | 用户/内容分层比较和样本稳定性标记 |
+| `vw_metric_business_user_paired` | 一名共同用户 | 用户等权配对差异，供Python计算Bootstrap置信区间 |
+
+同期比较固定为 2022-04-22 至 2022-05-08。预期标准推荐 289,119 条、随机推荐 1,186,049 条，共同用户 25,877 名。
+
+SQL视图提供可复算的数据入口；95% Bootstrap置信区间、构成校正和图表由 `Python/08_推荐策略业务深化分析.ipynb` 完成。
