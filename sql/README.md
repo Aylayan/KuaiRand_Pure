@@ -21,6 +21,7 @@
 6. `06_sql_core_metrics_reconciliation.sql`：复算核心指标并与 Python 基准核对。
 7. `07_create_metric_views.sql`：创建 6 张 Power BI 稳定指标视图。
 8. `08_create_business_analysis_views.sql`：创建同期推荐质量链、用户/内容分层和共同用户配对分析视图。
+9. `09_create_business_result_tables_and_views.sql`：将 Python 已计算完成的配对验证和构成校正结果快照写入结果表，并创建供 Power BI 使用的稳定视图。
 
 ## 运行环境
 
@@ -44,6 +45,13 @@
 
 `*_rate_pct` 已是 0—100 的百分数值，Power BI 只添加 `%` 显示符号。
 
+第 4 页“推荐策略业务深化”另外使用以下聚合视图：
+
+- `vw_metric_business_quality_chain`
+- `vw_metric_business_segments`
+- `vw_metric_business_paired_validation`
+- `vw_metric_business_composition_adjustment`
+
 ## 业务深化分析视图
 
 `08_create_business_analysis_views.sql` 在原有分析视图之上增加以下对象，不修改四张基础表：
@@ -58,3 +66,14 @@
 同期比较固定为 2022-04-22 至 2022-05-08。预期标准推荐 289,119 条、随机推荐 1,186,049 条，共同用户 25,877 名。
 
 SQL视图提供可复算的数据入口；95% Bootstrap置信区间、构成校正和图表由 `Python/08_推荐策略业务深化分析.ipynb` 完成。
+
+## Python 结果快照与稳定视图
+
+`09_create_business_result_tables_and_views.sql` 不会在 MySQL 中重新执行 Bootstrap 或构成校正，而是将 Python 已生成并核对的结果写入以下结果表：
+
+| 结果表 | 预期行数 | 来源 |
+|---|---:|---|
+| `result_business_paired_validation` | 5 | `outputs/business_analysis/paired_user_validation.csv` |
+| `result_business_composition_adjustment` | 20 | `outputs/business_analysis/composition_adjustment.csv` |
+
+脚本使用事务执行结果快照的替换，并创建 `vw_metric_business_paired_validation` 和 `vw_metric_business_composition_adjustment` 两张稳定视图。执行后应继续运行脚本末尾的行数、主键和空值检查；如果以后重新生成 Python 结果，需要同步更新 SQL 09 中的快照值后再刷新 Power BI。

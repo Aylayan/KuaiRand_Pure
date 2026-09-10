@@ -18,7 +18,7 @@
 - 技术链路：`CSV → Pandas 清洗/审计 → Parquet → MySQL → 聚合视图 → Power BI`。
 - 数据质量：完成重复日志、视频时长缺失、时间字段口径、跨表参照完整性以及“零播放却有互动”等检查。
 - 指标体系：推荐规模、点击率、长播率、完整播放率、综合互动率、播放时长中位数与播放进度中位数等。
-- 看板结构：总体与趋势、用户与内容分层、推荐方式同期描述性比较。
+- 看板结构：总体与趋势、用户与内容分层、推荐方式同期描述性比较、推荐策略业务深化。
 - 业务深化：以前期已经发现的推荐方式总体指标差异为基线，新增点击后条件口径、同用户配对、用户级 Bootstrap、推荐方式分层差值和共同构成校正，形成从描述性发现到待验证策略的证据链。
 
 ## 关键结果
@@ -55,7 +55,7 @@
 
 ![共同构成校正](outputs/figures/business_04_composition_adjustment.png)
 
-完整问题拆解、统计方法、策略假设、A/B 测试方案和结果边界见 [业务分析证据链](docs/业务分析证据链.md)；可复现代码见 [08_推荐策略业务深化分析.ipynb](Python/08_推荐策略业务深化分析.ipynb)。当前 Power BI 文件仍保留原有三页看板，本阶段新增结果通过 Notebook、CSV 和 PNG 交付，并另外提供可供后续 BI 接入的 SQL 视图。
+完整问题拆解、统计方法、策略假设、A/B 测试方案和结果边界见 [业务分析证据链](docs/业务分析证据链.md)；可复现代码见 [08_推荐策略业务深化分析.ipynb](Python/08_推荐策略业务深化分析.ipynb)。业务深化结果同时保留为 Notebook 输出、CSV、PNG 和 MySQL 稳定视图，并已接入 Power BI 第 4 页。
 
 ## Power BI 看板
 
@@ -71,6 +71,10 @@
 
 ![推荐方式同期描述性比较](powerbi/screenshots/03_推荐方式对比.png)
 
+### 4. 推荐策略业务深化
+
+![推荐策略业务深化](powerbi/screenshots/04_推荐策略业务深化.png)
+
 ## 项目结构
 
 ```text
@@ -78,7 +82,7 @@ KuaiRand_Pure/
 ├─ README.md
 ├─ LICENSE
 ├─ Python/                  # 8 个可复现 Notebook
-├─ sql/                     # 建库、建表、导入、质检、分析视图与业务分析视图
+├─ sql/                     # 9 个建库、导入、质检、指标与业务结果脚本
 ├─ powerbi/
 │  ├─ 可视化看板.pbix
 │  └─ screenshots/
@@ -99,8 +103,8 @@ KuaiRand_Pure/
 1. 按 [data/README.md](data/README.md) 准备公开数据文件。
 2. 安装 Python 依赖：`pip install -r requirements.txt`。
 3. 依次运行 `Python/01` 至 `Python/07`，生成清洗 Parquet 与 MySQL 导入 CSV；运行 `Python/08`，可直接读取原始同期日志并复现业务深化分析的 CSV 与 PNG。
-4. 按 [sql/README.md](sql/README.md) 的顺序运行 `sql/01` 至 `sql/07`；如需在 MySQL 中复算业务深化指标，再运行 `sql/08` 创建四张业务分析视图。
-5. 使用 Import 模式连接 MySQL 数据库 `kuairand_analytics`，加载六张 `vw_metric_*` 视图并刷新 Power BI。
+4. 按 [sql/README.md](sql/README.md) 的顺序运行 `sql/01` 至 `sql/09`：`08` 创建可复算的业务分析视图，`09` 将 Python 已计算完成的配对验证和构成校正结果快照写入结果表并创建稳定视图。
+5. 使用 Import 模式连接 MySQL 数据库 `kuairand_analytics`，加载基础指标视图和业务深化结果视图后刷新 Power BI。
 
 Notebook 会从当前目录向上自动寻找包含 `Python/` 和 `data/` 的项目根目录，因此既可以从项目根目录运行，也可以从 `Python/` 目录运行。MySQL 的 `LOAD DATA LOCAL INFILE` 需要本地绝对路径，若项目移动，请同步修改 `sql/03_load_data.sql` 中的四个 CSV 路径。
 
